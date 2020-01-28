@@ -10,11 +10,19 @@ import UIKit
 import CoreData
 
 
-class ViewController: UIViewController {
+class ViewController: UIViewController{
     
+ 
+    //@IBOutlet weak var showdelete: UIButton!
     @IBOutlet weak var showDataTextView: UITextView!
     @IBOutlet weak var nameTextView: UITextField!
     @IBOutlet weak var ageTextView: UITextField!
+    
+    @IBOutlet weak var delettxt: UITextField!
+    
+    
+   
+    
     var textFieldString : String = ""
     var people = [People]()
     
@@ -23,8 +31,56 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         showAllPerson()
         
+        
+        
     }
 
+    @IBAction func deletebtn(_ sender: Any) {
+        deleteData()
+        showAllPerson()
+    }
+    
+        
+        func deleteData(){
+            
+            let managedContext = PersistenceService.persistentContainer.viewContext
+            
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "People")
+            
+          
+            let deletePerson = delettxt.text
+            
+            
+            // fetch the person to delete
+            fetchRequest.predicate = NSPredicate(format: "name = %@", deletePerson!)
+            
+            do{
+                let people = try managedContext.fetch(fetchRequest)
+                
+                for person in people{
+                    let objectToDelete = person as! NSManagedObject
+                    managedContext.delete(objectToDelete)
+                }
+                
+                print("Deleted item : ", people)
+                
+                do{
+                    try managedContext.save()
+                }
+                catch{
+                    print(error)
+                }
+            } catch {
+                print(error)
+                
+            }
+        }
+        
+        
+        
+        
+        
+    
     @IBAction func addButtonTapped(_ sender: Any) {
         let name = nameTextView.text
         let age = ageTextView.text
@@ -40,6 +96,16 @@ class ViewController: UIViewController {
         showAllPerson()
         
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     // Function for fetching and showing data
     func showAllPerson() {
@@ -64,5 +130,10 @@ class ViewController: UIViewController {
             print("Failed to fetch")
         }
     }
+    
+    
+    
+
 }
+
 
